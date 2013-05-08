@@ -3,6 +3,16 @@ function setDefaultSettings() {
     if(!value) {
         localStorage["ioscompat"] = true;
     }
+    
+    var value2 = localStorage["blacklist"];
+    if(!value2) {
+        localStorage["blacklist"] = '';
+    }
+    
+    var value3 = localStorage["emojisize"];
+    if(!value2) {
+        localStorage["emojisize"] = '16';
+    }
 }
 
 function listener(request, sender, sendResponse) {
