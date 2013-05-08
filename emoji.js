@@ -1,4 +1,4 @@
-﻿jQuery.fn.just_text = function() {
+jQuery.fn.just_text = function() {
     return $(this).clone()
         .children()
         .remove()
@@ -45,12 +45,13 @@ function get_replacement(matched) {
     }
     var relative = "images/" + image;
     var absolute = chrome.extension.getURL(relative);
-    var element = "<img src='" + absolute + "' class='emoji'";
-    if(name != "") {
-        element += " title='" + name + "' alt='" + name + "' ";
-    }
-    element += ">";
-    return element;
+    
+          var element = "<img src='" + absolute + "' class='chromoji-" + emojisize + "'";
+          if(name != "") {
+            element += " title='" + name + "' alt='" + name + "' ";
+          }
+          element += ">";
+          return element;     
 }
 
 function run(nodes) {
@@ -66,8 +67,8 @@ function run(nodes) {
                         }
                     );
                     
-                    if(matched.length > 0) {
-                        return get_replacement(matched[0]);
+                    if(matched.length > 0) {        
+                       return get_replacement(matched[0]);                        
                     }
                     
                     return c;
@@ -132,8 +133,14 @@ function init() {
                     create_pattern(valid);
                     regexp = new RegExp(pattern, 'g');
                     var nodes = filter_nodes($('body'), regexp);
-                    run(nodes);
-                    start_observer();
+                        
+chrome.extension.sendMessage({setting: "emojisize"},
+ function (response) { 
+  emojisize = response.result;
+  run(nodes);
+  start_observer();
+});
+
                 }
             );
         }
@@ -150,6 +157,23 @@ var hidden;
 
 $(document).ready(
     function () {
-        init();
+    
+        chrome.extension.sendMessage({setting: "blacklist"},
+        function (response) {                     
+            blacklist = response.result;            
+            blacklist = blacklist.split(',');
+            
+            InBlacklist = '0';
+            $.each(blacklist,function(key,value){
+              if(document.domain==value || document.domain==value.substr(4) ||  document.domain=='www.'+value){
+               InBlacklist = '1';
+              }
+            });          
+            
+            if(InBlacklist=='0'){
+             init();
+            }
+        });
+
     }
 );
